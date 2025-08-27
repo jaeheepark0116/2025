@@ -60,12 +60,13 @@ if search_query:
             food = animals[search_query]["food"]
             img = animals[search_query]["img"]
             st.success(f"✅ [{category}] {search_query}의 주 먹이는 **{food}** 입니다!")
-            st.image(img, caption=search_query, use_column_width=True)
+            st.image(img, caption=search_query, use_container_width=True, output_format="auto")
             found = True
             break
     if not found:
         st.warning("❌ 해당 동물 정보를 찾을 수 없습니다. 카테고리에서 직접 선택해보세요!")
 
+# --- 사이드바 ---
 st.sidebar.title("📂 카테고리별 탐색")
 category = st.sidebar.radio("카테고리 선택", list(animal_data.keys()))
 animal_name = st.sidebar.selectbox("동물 선택", [""] + sorted(animal_data[category].keys()))
@@ -74,4 +75,4 @@ if animal_name:
     food = animal_data[category][animal_name]["food"]
     img = animal_data[category][animal_name]["img"]
     st.success(f"✅ [{category}] {animal_name}의 주 먹이는 **{food}** 입니다!")
-    st.image(img, caption=animal_name, use_column_width=True)
+    st.image(img, caption=animal_name, use_container_width=True, output_format="auto")
