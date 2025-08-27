@@ -1,84 +1,144 @@
 import streamlit as st
 
-# --- 동물 데이터 (확장 + 썸네일 적용) ---
-animal_data = {
-    "포유류": {
-        "사자": {"food": "고기 🥩 (주로 초식동물)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Lion_waiting_in_Namibia.jpg/400px-Lion_waiting_in_Namibia.jpg"},
-        "호랑이": {"food": "고기 🥩 (사슴, 멧돼지 등)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Tiger.50.jpg/400px-Tiger.50.jpg"},
-        "코끼리": {"food": "풀 🌱, 나뭇잎 🍃, 과일 🍎", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/African_Bush_Elephant.jpg/400px-African_Bush_Elephant.jpg"},
-        "곰": {"food": "잡식 🐟🍯🍓 (연어, 꿀, 열매 등)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Brown_bear_in_forest.jpg/400px-Brown_bear_in_forest.jpg"},
-        "판다": {"food": "대나무 🎋", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/400px-Grosser_Panda.JPG"},
-        "기린": {"food": "나뭇잎 🍃 (특히 아카시아)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Giraffe_standing.jpg/400px-Giraffe_standing.jpg"},
-        "여우": {"food": "잡식 🐭🍓 (작은 동물, 과일 등)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/2010-british-red-fox.jpg/400px-2010-british-red-fox.jpg"},
-        "늑대": {"food": "고기 🥩 (사슴, 토끼 등)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Canis_lupus_laying.jpg/400px-Canis_lupus_laying.jpg"},
-        "코알라": {"food": "유칼립투스 잎 🌿", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Koala_climbing_tree.jpg/400px-Koala_climbing_tree.jpg"},
-        "캥거루": {"food": "풀 🌱, 나뭇잎 🍃", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Kangaroo_Australia_01.jpg/400px-Kangaroo_Australia_01.jpg"},
-        "하마": {"food": "풀 🌱", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Hippopotamus_in_South_Africa_adjusted.jpg/400px-Hippopotamus_in_South_Africa_adjusted.jpg"},
-        "치타": {"food": "고기 🥩 (영양, 토끼 등)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Cheetah_with_cubs_2.jpg/400px-Cheetah_with_cubs_2.jpg"},
+st.set_page_config(page_title="미술사 탐색기", page_icon="🖼️", layout="wide")
+
+# ---------------------------
+# 데이터: 시대 → 화가 → 작품(제목, 연도, 이미지)
+# ---------------------------
+art_data = {
+    "르네상스": {
+        "레오나르도 다 빈치": [
+            {"title": "모나 리자", "year": "c.1503–1506",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/400px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"},
+            {"title": "최후의 만찬", "year": "1495–1498",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/%C3%9Altima_Cena_-_Da_Vinci_5.jpg/400px-%C3%9Altima_Cena_-_Da_Vinci_5.jpg"},
+        ],
+        "미켈란젤로": [
+            {"title": "천지창조 (아담의 창조)", "year": "c.1512",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Michelangelo_-_Creation_of_Adam_%28cropped%29.jpg/400px-Michelangelo_-_Creation_of_Adam_%28cropped%29.jpg"},
+            {"title": "다비드", "year": "1501–1504",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/%27David%27_by_Michelangelo_Fir_JBU001.jpg/400px-%27David%27_by_Michelangelo_Fir_JBU001.jpg"},
+        ],
+        "라파엘로": [
+            {"title": "아테네 학당", "year": "1509–1511",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Sanzio_01.jpg/400px-Sanzio_01.jpg"},
+            {"title": "시스틴의 성모", "year": "1512",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Raffael_067.jpg/400px-Raffael_067.jpg"},
+        ],
     },
-    "조류": {
-        "독수리": {"food": "고기 🥩 (사체, 작은 동물)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Griffon_vulture_in_flight.jpg/400px-Griffon_vulture_in_flight.jpg"},
-        "부엉이": {"food": "작은 동물 🐭, 새 🐦", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Eurasian_Eagle-Owl_RWD3.jpg/400px-Eurasian_Eagle-Owl_RWD3.jpg"},
-        "참새": {"food": "씨앗 🌾, 곤충 🐛", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/House_Sparrow_mar08.jpg/400px-House_Sparrow_mar08.jpg"},
-        "앵무새": {"food": "씨앗 🌾, 과일 🍎", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Ara_ararauna_Luc_Viatour.jpg/400px-Ara_ararauna_Luc_Viatour.jpg"},
-        "펭귄": {"food": "물고기 🐟, 크릴 🦐", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juveniles-8.jpg/400px-Aptenodytes_forsteri.jpg"},
-        "타조": {"food": "풀 🌱, 씨앗 🌾", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Common_ostrich_male.jpg/400px-Common_ostrich_male.jpg"},
-        "공작": {"food": "씨앗 🌾, 곤충 🐛, 과일 🍎", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Peacock_Plumage.jpg/400px-Peacock_Plumage.jpg"},
-        "백조": {"food": "수생식물 🌿, 곤충 🐛", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Cygnus_olor_AdPP.jpg/400px-Cygnus_olor_AdPP.jpg"},
+    "바로크": {
+        "카라바조": [
+            {"title": "성 마태오의 소명", "year": "1599–1600",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Caravaggio_-_The_Calling_of_Saint_Matthew.jpg/400px-Caravaggio_-_The_Calling_of_Saint_Matthew.jpg"},
+            {"title": "바쿠스", "year": "c.1595",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Caravaggio_-_Bacchus.jpg/400px-Caravaggio_-_Bacchus.jpg"},
+        ],
+        "렘브란트": [
+            {"title": "야경", "year": "1642",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/The_Nightwatch_by_Rembrandt.jpg/400px-The_Nightwatch_by_Rembrandt.jpg"},
+            {"title": "툴프 박사의 해부학 강의", "year": "1632",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg/400px-Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg"},
+        ],
+        "루벤스": [
+            {"title": "십자가 올리기", "year": "1610–1611",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Rubens_-_The_Elevation_of_the_Cross_-_WGA20257.jpg/400px-Rubens_-_The_Elevation_of_the_Cross_-_WGA20257.jpg"},
+            {"title": "십자가에서 내림", "year": "1612–1614",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Peter_Paul_Rubens_-_Descent_from_the_Cross_-_WGA20175.jpg/400px-Peter_Paul_Rubens_-_Descent_from_the_Cross_-_WGA20175.jpg"},
+        ],
     },
-    "해양 동물": {
-        "돌고래": {"food": "물고기 🐟, 오징어 🦑", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Dolphins_in_the_Red_Sea.jpg/400px-Dolphins_in_the_Red_Sea.jpg"},
-        "상어": {"food": "물고기 🐟, 해양 포유류 🐋", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/White_shark.jpg/400px-White_shark.jpg"},
-        "고래": {"food": "플랑크톤 🦠, 물고기 🐟", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Humpback_stellwagen_edit.jpg/400px-Humpback_stellwagen_edit.jpg"},
-        "문어": {"food": "갑각류 🦐, 조개 🦪, 물고기 🐟", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Octopus2.jpg/400px-Octopus2.jpg"},
-        "거북이": {"food": "해초 🌿, 해조류 🌱", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Green_turtle_swimming_over_coral_reefs_in_Kona.jpg/400px-Green_turtle_swimming_over_coral_reefs_in_Kona.jpg"},
-        "해마": {"food": "플랑크톤 🦠, 작은 갑각류 🦐", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Hippocampus_seahorse.jpg/400px-Hippocampus_seahorse.jpg"},
-        "물개": {"food": "물고기 🐟, 오징어 🦑", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Sealion2.jpg/400px-Sealion2.jpg"},
+    "인상파": {
+        "클로드 모네": [
+            {"title": "인상, 해돋이", "year": "1872",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Claude_Monet%2C_Impression%2C_soleil_levant.jpg/400px-Claude_Monet%2C_Impression%2C_soleil_levant.jpg"},
+            {"title": "수련", "year": "1916",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Monet_Water_Lilies_1916.jpg/400px-Monet_Water_Lilies_1916.jpg"},
+        ],
+        "오귀스트 르누아르": [
+            {"title": "물랭 드 라 갈레트의 무도회", "year": "1876",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Auguste_Renoir_-_Dance_at_Le_Moulin_de_la_Galette_-_Google_Art_Project.jpg/400px-Auguste_Renoir_-_Dance_at_Le_Moulin_de_la_Galette_-_Google_Art_Project.jpg"},
+        ],
+        "에드가 드가": [
+            {"title": "발레 수업", "year": "c.1871–1874",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Edgar_Degas_-_The_Ballet_Class_-_Google_Art_Project.jpg/400px-Edgar_Degas_-_The_Ballet_Class_-_Google_Art_Project.jpg"},
+        ],
     },
-    "파충류 & 양서류": {
-        "악어": {"food": "고기 🥩 (물가 동물)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/NileCrocodile.jpg/400px-NileCrocodile.jpg"},
-        "뱀": {"food": "작은 동물 🐭, 새 🐦, 개구리 🐸", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Python_molurus_molurus.jpg/400px-Python_molurus_molurus.jpg"},
-        "개구리": {"food": "곤충 🐛, 작은 절지동물 🦗", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Green_frog_in_pond.jpg/400px-Green_frog_in_pond.jpg"},
-        "도마뱀": {"food": "곤충 🐛, 작은 동물 🐭", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Komodo_dragon_Varanus_komodoensis_edit2.jpg/400px-Komodo_dragon_Varanus_komodoensis_edit2.jpg"},
-        "거북": {"food": "풀 🌱, 곤충 🐛", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Greek_tortoise_Male.jpg/400px-Greek_tortoise_Male.jpg"},
+    "후기 인상파": {
+        "빈센트 반 고흐": [
+            {"title": "별이 빛나는 밤", "year": "1889",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/400px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg"},
+            {"title": "해바라기", "year": "1888",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Vincent_Willem_van_Gogh_128.jpg/400px-Vincent_Willem_van_Gogh_128.jpg"},
+        ],
+        "폴 고갱": [
+            {"title": "설교 후의 환상", "year": "1888",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Paul_Gauguin_-_Vision_After_the_Sermon_%28Jacob_Wrestling_with_the_Angel%29.jpg/400px-Paul_Gauguin_-_Vision_After_the_Sermon_%28Jacob_Wrestling_with_the_Angel%29.jpg"},
+            {"title": "우리는 어디서 왔는가, 우리는 무엇인가, 어디로 가는가", "year": "1897–1898",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/D%27où_venons-nous_Que_sommes-nous_Où_allons-nous.jpg/400px-D%27où_venons-nous_Que_sommes-nous_Où_allons-nous.jpg"},
+        ],
+        "폴 세잔": [
+            {"title": "카드놀이 하는 사람들", "year": "c.1894–1895",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Paul_C%C3%A9zanne%2C_The_Card_Players%2C_c._1894%E2%80%965.jpg/400px-Paul_C%C3%A9zanne%2C_The_Card_Players%2C_c._1894%E2%80%965.jpg"},
+            {"title": "몽 생트 빅투아르", "year": "c.1904–1906",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Paul_Ce%CC%81zanne_-_Mont_Sainte-Victoire.jpg/400px-Paul_Ce%CC%81zanne_-_Mont_Sainte-Victoire.jpg"},
+        ],
     },
-    "곤충": {
-        "벌": {"food": "꽃꿀 🍯, 꽃가루 🌸", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Honeybee_on_purple_coneflower.jpg/400px-Honeybee_on_purple_coneflower.jpg"},
-        "개미": {"food": "잡식 🍞🪱 (설탕, 곤충, 식물 등)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Ant_Oecophylla_smargdina.jpg/400px-Ant_Oecophylla_smargdina.jpg"},
-        "무당벌레": {"food": "진딧물 🐛", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Coccinella_septempunctata01.jpg/400px-Coccinella_septempunctata01.jpg"},
-        "잠자리": {"food": "작은 곤충 🦟", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Common_Darter_dragonfly.jpg/400px-Common_Darter_dragonfly.jpg"},
-        "나비": {"food": "꽃꿀 🍯", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Monarch_Butterfly_Danaus_plexippus_Male_2664px.jpg/400px-Monarch_Butterfly.jpg"},
-        "사마귀": {"food": "곤충 🦟, 작은 동물 🐭", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Mantis_religiosa_1_Luc_Viatour.jpg/400px-Mantis_religiosa_1_Luc_Viatour.jpg"},
-        "매미": {"food": "수액 🌳", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Tibicen_chloromera_fg01.jpg/400px-Tibicen_chloromera_fg01.jpg"},
-    }
+    "근대 미술": {
+        "파블로 피카소": [
+            {"title": "아비뇽의 처녀들", "year": "1907",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Les_Demoiselles_d%27Avignon.jpg/400px-Les_Demoiselles_d%27Avignon.jpg"},
+            {"title": "게르니카", "year": "1937",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Guernica.jpg/400px-Guernica.jpg"},
+        ],
+        "앙리 마티스": [
+            {"title": "춤", "year": "1910",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Henri_Matisse%2C_1910%2C_La_Danse%2C_oil_on_canvas%2C_260_x_391_cm%2C_Hermitage%2C_St_Petersburg.jpg/400px-Henri_Matisse%2C_1910%2C_La_Danse%2C_oil_on_canvas%2C_260_x_391_cm%2C_Hermitage%2C_St_Petersburg.jpg"},
+            {"title": "모자를 쓴 여인", "year": "1905",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Matisse-Woman-with-a-Hat.jpg/400px-Matisse-Woman-with-a-Hat.jpg"},
+        ],
+    },
+    "낭만주의": {
+        "외젠 들라크루아": [
+            {"title": "민중을 이끄는 자유", "year": "1830",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg/400px-Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg"},
+        ],
+        "J. M. W. 터너": [
+            {"title": "전함 테메레르", "year": "1839",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Joseph_Mallord_William_Turner_-_The_Fighting_Temeraire%2C_tugged_to_her_last_berth_to_be_broken.jpg/400px-Joseph_Mallord_William_Turner_-_The_Fighting_Temeraire%2C_tugged_to_her_last_berth_to_be_broken.jpg"},
+            {"title": "비, 증기 그리고 속도", "year": "1844",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/JMW_Turner_-_Rain_Steam_and_Speed_-_The_Great_Western_Railway.jpg/400px-JMW_Turner_-_Rain_Steam_and_Speed_-_The_Great_Western_Railway.jpg"},
+        ],
+        "프란시스코 고야": [
+            {"title": "1808년 5월 3일", "year": "1814",
+             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/El_Tres_de_Mayo%2C_by_Francisco_de_Goya%2C_from_Prado_thin_black_margin.jpg/400px-El_Tres_de_Mayo%2C_by_Francisco_de_Goya%2C_from_Prado_thin_black_margin.jpg"},
+        ],
+    },
 }
 
-# --- Streamlit 앱 ---
-st.title("🌍 동물 백과사전 (먹이 & 사진)")
+# ---------------------------
+# UI
+# ---------------------------
+st.title("🖼️ 시대별 · 화가별 대표 작품 보기")
 
-# 검색 입력창
-search_query = st.text_input("🔍 동물 이름으로 검색하세요:")
+# 1) 시대 선택
+era = st.sidebar.radio("시대를 선택하세요", list(art_data.keys()))
 
-if search_query:
-    found = False
-    for category, animals in animal_data.items():
-        if search_query in animals:
-            food = animals[search_query]["food"]
-            img = animals[search_query]["img"]
-            st.success(f"✅ [{category}] {search_query}의 주 먹이는 **{food}** 입니다!")
-            st.image(img, caption=search_query, use_container_width=True)
-            found = True
-            break
-    if not found:
-        st.warning("❌ 해당 동물 정보를 찾을 수 없습니다. 카테고리에서 직접 선택해보세요!")
+# 2) 화가 선택 (시대에 따라 동적으로 목록 변경)
+painters = list(art_data[era].keys())
+painter = st.sidebar.selectbox("화가를 선택하세요", painters)
 
-# --- 사이드바 탐색 ---
-st.sidebar.title("📂 카테고리별 탐색")
-category = st.sidebar.radio("카테고리 선택", list(animal_data.keys()))
-animal_name = st.sidebar.selectbox("동물 선택", [""] + sorted(animal_data[category].keys()))
+st.markdown(f"### {era} · **{painter}**의 주요 작품")
 
-if animal_name:
-    food = animal_data[category][animal_name]["food"]
-    img = animal_data[category][animal_name]["img"]
-    st.success(f"✅ [{category}] {animal_name}의 주 먹이는 **{food}** 입니다!")
-    st.image(img, caption=animal_name, use_container_width=True)
+# 3) 작품 카드 그리드 표시
+works = art_data[era][painter]
+cols = st.slider("한 줄에 보여줄 작품 수", min_value=2, max_value=4, value=3, help="화면 폭에 맞춰 조절하세요")
+grid = st.columns(cols)
+
+for i, work in enumerate(works):
+    with grid[i % cols]:
+        st.image(work["img"], use_container_width=True, caption=work["title"])
+        st.caption(f"📅 {work['year']} · {painter}")
+
+# (선택) 작품 수가 많아질 경우 대비해 간단한 검색 필터를 붙이려면 아래 주석을 해제하세요.
+# keyword = st.text_input("작품 제목 검색")
+# if keyword:
+#     works = [w for w in works if keyword.strip() in w["title"]]
